@@ -234,7 +234,7 @@ sampling — with alternatives and trade-offs, is in **[DESIGN.md](DESIGN.md)**.
 
 ### 1. Live UI — suggestions, recency toggle & trending
 
-![Search Typeahead UI](docs/screenshots/01-ui-overview.png)
+![Search Typeahead UI]<img width="791" height="760" alt="Screenshot 2026-06-22 040625" src="https://github.com/user-attachments/assets/7d7c5217-c5aa-43d5-bbc0-8bc0f1e5b247" />
 
 The full single-page UI: a debounced suggestion dropdown, the **Recency-aware ranking** toggle
 (ON = `trending` mode, OFF = `basic` all-time-count mode), the inline **Searched** confirmation, and
@@ -244,7 +244,8 @@ and it auto-refreshes every ~20 s.
 
 ### 2. Cold cache (cache **MISS**) — slower, DB-backed
 
-![Cache miss in the Network tab](docs/screenshots/02-cache-miss.png)
+![Cache miss in the Network tab]<img width="1702" height="925" alt="Screenshot 2026-06-22 040746" src="https://github.com/user-attachments/assets/71f65f7f-b1b6-48c7-a411-972e9897c766" />
+
 
 Typing `anshul` for the **first time**. Each new prefix (`ansh`, `anshu`, `anshul`) is **not in Redis
 yet**, so every `/suggest` is a **cache miss**: the server falls back to SQLite, runs a prefix scan +
@@ -255,7 +256,8 @@ uncached prefix.
 
 ### 3. Warm cache (cache **HIT**) + frontend debounce — faster
 
-![Cache hit in the Network tab](docs/screenshots/03-cache-hit.png)
+![Cache hit in the Network tab]<img width="1750" height="930" alt="Screenshot 2026-06-22 040704" src="https://github.com/user-attachments/assets/f4f0f3a3-890e-4ab1-a5e9-bdae3383d1b7" />
+
 
 Typing the **same** `anshul` again. Two optimizations are visible at once:
 
