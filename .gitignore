@@ -1,0 +1,5 @@
+node_modules/
+data/
+
+# Local-only viva prep notes — not for the public/submission repo
+docs/CODEBASE_ANALYSIS.md

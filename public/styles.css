@@ -1,0 +1,273 @@
+:root {
+  --accent: #4f6ef2;          /* ek hi restrained accent color */
+  --accent-soft: #eef1fe;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #1f2330;
+  --muted: #8b90a0;
+  --border: #e3e6ee;
+  --shadow: 0 8px 28px rgba(31, 35, 48, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12vh 20px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0 0 28px;
+  color: var(--text);
+}
+.logo span { color: var(--accent); }
+
+/* Search area relative -> dropdown ko absolutely position kar sake. */
+.search-area {
+  position: relative;
+  width: 100%;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 6px 6px 6px 22px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+/* Focus ring jab input focused ho. */
+.search-bar:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow);
+}
+
+#search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1.1rem;
+  padding: 12px 0;
+  background: transparent;
+  color: var(--text);
+}
+#search-input::placeholder { color: var(--muted); }
+
+.search-btn {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.search-btn:hover { background: #3f5bd6; }
+
+/* Small spinner — subtle, non-jarring. */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Dropdown bar se attached dikhta hai — soft shadow, thoda overlap. */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  z-index: 10;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.suggestion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+/* Hover + keyboard highlight dono visually distinct. */
+.suggestion:hover,
+.suggestion.active {
+  background: var(--accent-soft);
+}
+.suggestion .text { color: var(--text); }
+/* Typed prefix ke baad ka hissa bold -> match samajhna easy. */
+.suggestion .text b { font-weight: 700; }
+.suggestion .count {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* No-match row — calm, error nahi. */
+.suggestion.empty {
+  color: var(--muted);
+  cursor: default;
+  justify-content: center;
+}
+.suggestion.empty:hover { background: transparent; }
+
+.error {
+  width: 100%;
+  margin: 12px 0 0;
+  padding: 10px 16px;
+  background: #fff3f3;
+  border: 1px solid #ffd4d4;
+  color: #c0392b;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Phase 3: search response area — calm card below the bar. */
+.response {
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  font-size: 0.95rem;
+}
+.response .badge {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+.response .q { font-weight: 600; }
+.response .meta { color: var(--muted); font-size: 0.85rem; }
+.response.is-error {
+  background: #fff3f3;
+  border-color: #ffd4d4;
+  color: #c0392b;
+}
+
+/* Button loading state — disabled + text swap. */
+.search-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.trending {
+  width: 100%;
+  margin-top: 48px;
+}
+.trending h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.trending-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 40px;
+}
+
+/* Phase 5: trending items — clickable pills/rows. */
+.trending-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  background: var(--surface);
+  transition: border-color 0.15s, background 0.15s;
+}
+.trending-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+.trending-item .rank {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 22px;
+}
+.trending-item .t-query { flex: 1; }
+.trending-item .t-score { color: var(--muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.trending-empty { color: var(--muted); font-size: 0.9rem; }
+
+/* Phase 5: recency toggle — accent-colored switch. */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--border);
+  border-radius: 999px;
+  transition: background 0.15s;
+  flex: 0 0 auto;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+.toggle input:checked + .toggle-track { background: var(--accent); }
+.toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(18px); }
+.toggle input:focus-visible + .toggle-track { box-shadow: 0 0 0 3px var(--accent-soft); }
+.toggle-label { color: var(--muted); }

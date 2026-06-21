@@ -1,0 +1,25 @@
+# Phase 4: 3 SEPARATE Redis instances (NOT Redis Cluster).
+# Redis Cluster fixed 16384 hash-slots (CRC16) use karta hai, woh classic consistent hashing
+# nahi hai; assignment ne consistent hashing implement karne ko bola hai, isliye independent
+# nodes + app-layer ring (Ketama jaisa pattern).
+services:
+  redis-node-1:
+    image: redis:7-alpine
+    container_name: typeahead-redis-1
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+  redis-node-2:
+    image: redis:7-alpine
+    container_name: typeahead-redis-2
+    ports:
+      - "6380:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+
+  redis-node-3:
+    image: redis:7-alpine
+    container_name: typeahead-redis-3
+    ports:
+      - "6381:6379"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
