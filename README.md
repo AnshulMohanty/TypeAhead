@@ -228,5 +228,48 @@ sampling — with alternatives and trade-offs, is in **[DESIGN.md](DESIGN.md)**.
 
 ## Screenshots / demo
 
-Drop UI screenshots or a short demo video link in [`docs/screenshots/`](docs/screenshots/)
-(placeholder — add images/links here).
+> Images live in [`docs/screenshots/`](docs/screenshots/). The two DevTools captures below show the
+> **same prefix** (`anshul`) on a **cold cache** vs a **warm cache** — the clearest way to see what the
+> Redis layer actually buys you.
+
+### 1. Live UI — suggestions, recency toggle & trending
+
+![Search Typeahead UI](docs/screenshots/01-ui-overview.png)
+
+The full single-page UI: a debounced suggestion dropdown, the **Recency-aware ranking** toggle
+(ON = `trending` mode, OFF = `basic` all-time-count mode), the inline **Searched** confirmation, and
+the live **TRENDING** list ranked by decayed recency. Trending only fills in *after* real searches are
+recorded and flushed by the write-behind writer (a fresh DB with zero searches shows an empty list),
+and it auto-refreshes every ~20 s.
+
+### 2. Cold cache (cache **MISS**) — slower, DB-backed
+
+![Cache miss in the Network tab](docs/screenshots/02-cache-miss.png)
+
+Typing `anshul` for the **first time**. Each new prefix (`ansh`, `anshu`, `anshul`) is **not in Redis
+yet**, so every `/suggest` is a **cache miss**: the server falls back to SQLite, runs a prefix scan +
+ranking, and *then* populates the owning Redis node (chosen by the consistent-hash ring). In the
+Network panel these land at **~35–38 ms** each. Contrast the `/trending` request at **~5 ms** — that
+one was already cached, i.e. a hit. This is the expensive path: one disk-backed query + rank per
+uncached prefix.
+
+### 3. Warm cache (cache **HIT**) + frontend debounce — faster
+
+![Cache hit in the Network tab](docs/screenshots/03-cache-hit.png)
+
+Typing the **same** `anshul` again. Two optimizations are visible at once:
+
+- **App-layer cache hit:** the prefix now lives in Redis, so `/suggest` skips the SQLite scan entirely
+  and returns the pre-ranked top-10 straight from the owning node — the heavy DB work from screenshot
+  #2 is gone.
+- **Frontend efficiency:** the 180 ms debounce + an `AbortController` cancel the in-flight intermediate
+  requests (the **`(canceled)`** rows for `ansh` / `anshu`), so only the final prefix actually resolves;
+  the repeat request returns **`304 Not Modified`** at just **0.2 kB** — nothing is re-downloaded.
+
+### Caching latency, in one line
+
+A **cache hit** serves a pre-ranked list straight from Redis memory (single-digit ms — p95 ≈ **3.7 ms**),
+while a **cache miss** pays for a SQLite prefix-scan + ranking (tens of ms — p95 ≈ **42.7 ms**, and the
+**~35–38 ms** observed above). So the more a prefix is searched, the warmer it stays in Redis and the
+faster it gets; cold or rare prefixes are the slow ones — and with Redis switched off entirely, *every*
+lookup takes the miss path. Full methodology and numbers are in [PERFORMANCE.md](PERFORMANCE.md).
